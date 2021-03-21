@@ -2,7 +2,7 @@
 
 exports[`app GET /config returns complete configuration 1`] = `
 Object {
-  "baseConfig": Object {
+  "baseMapping": Object {
     "status": 200,
   },
   "overrides": Object {

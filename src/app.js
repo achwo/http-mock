@@ -1,10 +1,19 @@
 const express = require("express");
+const { createLogger, requestLogger, errorLogger } = require("./logging.js");
 
-exports.createApp = ({ baseConfig, loggers: { request, error } }) => {
+/**
+ * @param {Object} arg
+ * @param {Object} arg.config The general config
+ * @param {number} arg.config.port The port on which the app runs
+ * @param {number} arg.config.logLevel The port on which the app runs
+ * @param {Object} arg.baseMapping The mapping used if nothing else is configured
+ * @param {Object} arg.overrides Overrides done by using the /config-Endpoint
+ */
+exports.createApp = ({ config, baseMapping }) => {
   const app = express();
   const overrides = {};
 
-  app.use(request);
+  app.use(requestLogger(config.logLevel));
   app.use(express.json());
 
   app.post("/config", (req, res) => {
@@ -14,15 +23,15 @@ exports.createApp = ({ baseConfig, loggers: { request, error } }) => {
   });
 
   app.get("/config", (req, res) => {
-    res.json({ baseConfig, overrides });
+    res.json({ baseMapping, overrides });
   });
 
   app.all("*", (req, res) => {
-    const status = overrides.status || baseConfig.status;
+    const status = overrides.status || baseMapping.status;
     res.status(status).json();
   });
 
-  app.use(error);
+  app.use(errorLogger(config.logLevel));
 
   return app;
 };

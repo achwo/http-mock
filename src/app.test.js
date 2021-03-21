@@ -1,19 +1,24 @@
 const request = require("supertest");
 const async = require("async");
 const { createApp } = require("./app.js");
+const logging = require("./logging.js");
+
+jest.mock("./logging.js");
+logging.requestLogger.mockImplementation(() => (_req, _res, next) => next());
+logging.errorLogger.mockImplementation(() => (_req, _res, next) => next());
 
 describe("app", () => {
   let app;
-  let config;
+  let arg;
 
   beforeEach(() => {
-    config = {
-      baseConfig: {
+    arg = {
+      config: {},
+      baseMapping: {
         status: 200,
       },
-      loggers: { request: (req, res, next) => next(), error: (req, res, next) => next() },
     };
-    app = createApp(config);
+    app = createApp(arg);
   });
 
   ["/", "/bla", "/some-other-path", "/some/deeper/path"].forEach((path) => {
@@ -30,8 +35,8 @@ describe("app", () => {
     });
 
     test(`default return value of ${path} can be configured`, (done) => {
-      config.baseConfig.status = 404;
-      const appReturning404 = createApp(config);
+      arg.baseMapping.status = 404;
+      const appReturning404 = createApp(arg);
       request(appReturning404).get(path).expect(404, done);
     });
 
