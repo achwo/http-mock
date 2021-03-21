@@ -36,7 +36,11 @@ const errorLogger = (level) =>
 
 const app = createApp({
   baseConfig,
-  loggers: { request: requestLogger(baseConfig.logLevel), error: errorLogger(baseConfig.logLevel) },
+  loggers: {
+    request: requestLogger(baseConfig.logLevel),
+    error: errorLogger(baseConfig.logLevel),
+    logger: createLogger(baseConfig.logLevel),
+  },
 });
 
 app.listen(baseConfig.port, () => {

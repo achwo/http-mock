@@ -1,12 +1,10 @@
 const express = require("express");
 
-exports.createApp = ({ baseConfig, loggers }) => {
+exports.createApp = ({ baseConfig, loggers: { request, error } }) => {
   const app = express();
-  const overrides = {
-    status: null,
-  };
+  const overrides = {};
 
-  app.use(loggers.request);
+  app.use(request);
   app.use(express.json());
 
   app.post("/config", (req, res) => {
@@ -15,14 +13,16 @@ exports.createApp = ({ baseConfig, loggers }) => {
     res.status(200).json();
   });
 
-  // app.get("/config", (req, res) => {
-  //   res.json({ baseConfig, overrides });
-  // });
+  app.get("/config", (req, res) => {
+    res.json({ baseConfig, overrides });
+  });
 
-  app.get("*", (req, res) => {
+  app.all("*", (req, res) => {
     const status = overrides.status || baseConfig.status;
     res.status(status).json();
   });
+
+  app.use(error);
 
   return app;
 };

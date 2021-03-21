@@ -16,16 +16,17 @@ curl -X POST http://localhost:3000/config \
 curl -I http://localhost:3000/test-path # returns 404
 ```
 
+## Show configuration
+
+The current config is accessible via GET /config.
 
 ## Roadmap
 
-1. GET /config
-1. POST /config/status for faster status configuration
-1. Mock response data
-1. Override specific paths
-1. Redirects
-1. Run on multiple ports:
-  1. Configuration
-  1. 1-n servers based on configuration
-1. Release npm package
-
+- [x] GET /config
+- [ ] Mock response data
+- [ ] Override specific paths
+- [ ] Redirects
+- [ ] Run on multiple ports:
+  - [ ] Configuration
+  - [ ] 1-n servers based on configuration
+- [ ] Release npm package

@@ -17,8 +17,16 @@ describe("app", () => {
   });
 
   ["/", "/bla", "/some-other-path", "/some/deeper/path"].forEach((path) => {
-    test(`returns 200 on ${path} by default`, (done) => {
+    test(`returns 200 on GET ${path} by default`, (done) => {
       request(app).get(path).expect(200, done);
+    });
+
+    test(`returns 200 on POST ${path} by default`, (done) => {
+      request(app).post(path).expect(200, done);
+    });
+
+    test(`returns 200 on PATCH ${path} by default`, (done) => {
+      request(app).patch(path).expect(200, done);
     });
 
     test(`default return value of ${path} can be configured`, (done) => {
@@ -36,5 +44,19 @@ describe("app", () => {
         done
       );
     });
+  });
+
+  test("GET /config returns complete configuration", (done) => {
+    async.series(
+      [
+        (cb) => request(app).post("/config").send({ status: 404 }).end(cb),
+        (cb) =>
+          request(app)
+            .get("/config")
+            .then((res) => expect(res.body).toMatchSnapshot())
+            .then(cb),
+      ],
+      done
+    );
   });
 });
