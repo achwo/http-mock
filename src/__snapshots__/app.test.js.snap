@@ -3,9 +3,11 @@
 exports[`app GET /config returns complete configuration 1`] = `
 Object {
   "baseMapping": Object {
+    "body": Object {},
     "status": 200,
   },
   "overrides": Object {
+    "routes": Array [],
     "status": 404,
   },
 }

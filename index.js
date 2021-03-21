@@ -1,7 +1,8 @@
 const { createApp } = require("./src/app.js");
 
-const baseConfig = {
+const baseMapping = {
   status: 200,
+  body: {},
 };
 
 const config = {
@@ -11,7 +12,7 @@ const config = {
 
 const app = createApp({
   config,
-  baseConfig,
+  baseMapping,
 });
 
 app.listen(config.port, () => {
