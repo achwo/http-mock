@@ -25,6 +25,7 @@ exports.createApp = ({ config, baseMapping }) => {
 
   app.post("/config", (req, res) => {
     overrides.status = req.body.status;
+    overrides.headers = req.body.headers;
     overrides.body = req.body.body;
     res.status(200).json();
   });
@@ -37,15 +38,18 @@ exports.createApp = ({ config, baseMapping }) => {
     const route = findMatchingRoute(req.path, req.method, overrides.routes);
     let status;
     let body;
+    let headers;
 
     if (!route) {
       status = overrides.status || baseMapping.status;
       body = overrides.body || baseMapping.body;
+      headers = overrides.headers || baseMapping.headers;
     } else {
       status = route.status;
       body = route.body;
+      headers = route.headers;
     }
-    res.status(status).json(body);
+    res.set(headers).status(status).json(body);
   });
 
   app.use(errorLogger(config.logLevel));

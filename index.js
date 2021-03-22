@@ -3,6 +3,7 @@ const { createApp } = require("./src/app.js");
 const baseMapping = {
   status: 200,
   body: {},
+  headers: {},
 };
 
 const config = {

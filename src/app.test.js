@@ -17,6 +17,7 @@ describe("app", () => {
       baseMapping: {
         status: 200,
         body: {},
+        headers: {},
       },
     };
     app = createApp(arg);
@@ -61,6 +62,20 @@ describe("app", () => {
           done
         );
       });
+
+      test(`returns headers set by api for ${method} ${path}`, (done) => {
+        async.series(
+          [
+            (cb) =>
+              request(app)
+                .post("/config")
+                .send({ headers: { Location: "/other-path" }, status: 301 })
+                .end(cb),
+            (cb) => request(app).get(path).expect(301).expect("Location", "/other-path", cb),
+          ],
+          done
+        );
+      });
     });
   });
 
@@ -90,12 +105,21 @@ describe("app", () => {
                   path: "/test",
                   status: 201,
                   body: { status: "created" },
+                  headers: { "Content-Type": "application/json" },
                 },
               ],
             })
             .end(cb),
-        (cb) => request(app).get("/test").expect(201, { status: "created" }, cb),
-        (cb) => request(app).post("/test").expect(201, { status: "created" }, cb),
+        (cb) =>
+          request(app)
+            .get("/test")
+            .expect(201, { status: "created" })
+            .expect("Content-Type", /json/, cb),
+        (cb) =>
+          request(app)
+            .post("/test")
+            .expect(201, { status: "created" })
+            .expect("Content-Type", /json/, cb),
         (cb) => request(app).get("/bla").expect(200, {}, cb),
       ],
       done

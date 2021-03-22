@@ -4,7 +4,7 @@ http-mock allows you to return mock data from any path you want.
 
 ## Configure via Endpoint
 
-http-mock allows you to configure the default status code and body:
+http-mock allows you to configure the default status code, headers and body:
 
 ```sh
 curl -I http://localhost:3000/test-path # returns 200
@@ -51,10 +51,14 @@ The current config is accessible via GET /config.
 - [x] GET /config
 - [x] Mock response data
 - [x] Override specific paths
+- [ ] headers
 - [ ] Override paths with route params
-- [ ] Redirects
+- [ ] load config via json
+- [ ] load overrides via multiple jsons
+- [ ] Dockerfile
 - [ ] Run on multiple ports:
   - [ ] Configuration
   - [ ] 1-n servers based on configuration
 - [ ] Release npm package
+- [ ] load HAR-files
 - [ ] https?
