@@ -51,7 +51,7 @@ The current config is accessible via GET /config.
 - [x] GET /config
 - [x] Mock response data
 - [x] Override specific paths
-- [ ] headers
+- [x] headers
 - [ ] Override paths with route params
 - [ ] load config via json
 - [ ] load overrides via multiple jsons
