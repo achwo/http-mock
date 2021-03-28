@@ -7,7 +7,6 @@ RUN yarn install --immutable && yarn cache clean
 
 COPY . .
 
-
 ENV CI=true
 RUN yarn test:ci
 

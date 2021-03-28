@@ -2,6 +2,21 @@
 
 http-mock allows you to return mock data from any path you want.
 
+## Docker
+
+http-mock has a dockerfile. You can override the configs as seen above.
+The `config`-Folder is located under `/app/config`. There you can mount
+your overrides.
+
+## Configure via File
+
+If you want to configure via file, you can override `config/mapping.json`
+with a valid configuration returned by the `GET /config`-Endpoint.
+
+There is also a `config/config.json`-File, in which basic configs like
+path and loglevel can be defined. Those can also be set via env-Variables
+`PORT` and `LOG_LEVEL`.
+
 ## Configure via Endpoint
 
 http-mock allows you to configure the default status code, headers and body:
@@ -84,8 +99,6 @@ The current config is accessible via GET /config.
 
 ## Roadmap
 
-- [ ] Dockerfile
-- [ ] Load config from file
 - [ ] Release npm package
 - [ ] Release Dockerfile?
 - [ ] load HAR-files

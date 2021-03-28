@@ -1,5 +1,5 @@
 const express = require("express");
-const { createLogger, requestLogger, errorLogger } = require("./logging.js");
+const { requestLogger, errorLogger } = require("./logging.js");
 const { sortRoutesBySpecificity, matchRoute } = require("./matcher.js");
 
 /**
@@ -9,9 +9,9 @@ const { sortRoutesBySpecificity, matchRoute } = require("./matcher.js");
  * @param {number} arg.config.logLevel The port on which the app runs
  * @param {Object} arg.baseMapping The mapping used if nothing else is configured
  */
-exports.createApp = ({ config }) => {
+exports.createApp = ({ config, mapping }) => {
   const app = express();
-  let routeMatches = [];
+  let routeMatches = mapping || [];
   const globalMatch = { type: "globalMatch" }
 
   app.use(requestLogger(config.logLevel));
