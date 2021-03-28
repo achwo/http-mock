@@ -1,0 +1,46 @@
+[
+  {
+    "path": "/test/:param/more-specific/:param3",
+    "method": "GET",
+    "status": 201,
+    "body": {
+      "status": "created more-specific"
+    },
+    "createdAt": "2021-03-28T10:21:58.993Z",
+    "type": "routeMatch"
+  },
+  {
+    "path": "/test/:param/:param1/:param3",
+    "method": "GET",
+    "status": 201,
+    "body": {
+      "status": "created too"
+    },
+    "createdAt": "2021-03-28T10:21:58.993Z",
+    "type": "routeMatch"
+  },
+  {
+    "path": "/test/:param",
+    "method": "GET",
+    "status": 201,
+    "body": {
+      "status": "created"
+    },
+    "createdAt": "2021-03-28T10:21:58.993Z",
+    "type": "routeMatch"
+  },
+  {
+    "path": "/other-path",
+    "method": "GET",
+    "status": 404,
+    "createdAt": "2021-03-28T10:21:58.993Z",
+    "type": "routeMatch"
+  },
+  {
+    "createdAt": "2021-03-28T10:21:58.993Z",
+    "type": "routeMatch"
+  },
+  {
+    "type": "globalMatch"
+  }
+]

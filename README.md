@@ -8,6 +8,8 @@ http-mock has a dockerfile. You can override the configs as seen above.
 The `config`-Folder is located under `/app/config`. There you can mount
 your overrides.
 
+The dockerfile is accessible in docker hub: https://hub.docker.com/repository/docker/achwo/http-mock.
+
 ## Configure via File
 
 If you want to configure via file, you can override `config/mapping.json`
@@ -99,6 +101,4 @@ The current config is accessible via GET /config.
 
 ## Roadmap
 
-- [ ] Release npm package
-- [ ] Release Dockerfile?
 - [ ] load HAR-files

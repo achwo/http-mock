@@ -1,0 +1,7 @@
+services:
+  auth:
+    image: achwo/http-mock
+    ports:
+      - "3000:3000"
+    volumes:
+      - ${PWD}/test-mapping.json:/app/config/mapping.json
