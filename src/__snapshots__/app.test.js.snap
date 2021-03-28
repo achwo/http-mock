@@ -1,15 +1,10 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`app GET /config returns complete configuration 1`] = `
-Object {
-  "baseMapping": Object {
-    "body": Object {},
-    "headers": Object {},
-    "status": 200,
-  },
-  "overrides": Object {
-    "routes": Array [],
+Array [
+  Object {
     "status": 404,
+    "type": "globalMatch",
   },
-}
+]
 `;

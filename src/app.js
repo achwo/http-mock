@@ -1,5 +1,6 @@
 const express = require("express");
 const { createLogger, requestLogger, errorLogger } = require("./logging.js");
+const { sortRoutesBySpecificity, matchRoute } = require("./matcher.js");
 
 /**
  * @param {Object} arg
@@ -7,48 +8,50 @@ const { createLogger, requestLogger, errorLogger } = require("./logging.js");
  * @param {number} arg.config.port The port on which the app runs
  * @param {number} arg.config.logLevel The port on which the app runs
  * @param {Object} arg.baseMapping The mapping used if nothing else is configured
- * @param {Object} arg.overrides Overrides done by using the /config-Endpoint
  */
-exports.createApp = ({ config, baseMapping }) => {
+exports.createApp = ({ config }) => {
   const app = express();
-  const overrides = {
-    routes: [],
-  };
+  let routeMatches = [];
+  const globalMatch = { type: "globalMatch" }
 
   app.use(requestLogger(config.logLevel));
   app.use(express.json());
 
   app.post("/config/routes", (req, res) => {
-    overrides.routes = overrides.routes.concat(req.body.routes);
+    const newRoutes = req.body.map(r => {
+      return Object.assign(r, {
+        createdAt: new Date(Date.now()),
+        type: "routeMatch"
+      })
+    }
+    )
+    routeMatches = routeMatches.concat(newRoutes);
     res.status(200).json();
   });
 
   app.post("/config", (req, res) => {
-    overrides.status = req.body.status;
-    overrides.headers = req.body.headers;
-    overrides.body = req.body.body;
+    globalMatch.status = req.body.status;
+    globalMatch.headers = req.body.headers;
+    globalMatch.body = req.body.body;
     res.status(200).json();
   });
 
   app.get("/config", (_req, res) => {
-    res.json({ baseMapping, overrides });
+    const allMatchers = sortRoutesBySpecificity([
+      ...routeMatches,
+      globalMatch,
+    ]);
+    res.json(allMatchers);
   });
 
   app.all("*", (req, res) => {
-    const route = findMatchingRoute(req.path, req.method, overrides.routes);
-    let status;
-    let body;
-    let headers;
+    const allMatchers = sortRoutesBySpecificity([
+      ...routeMatches,
+      globalMatch,
+      { status: 200 }
+    ]);
 
-    if (!route) {
-      status = overrides.status || baseMapping.status;
-      body = overrides.body || baseMapping.body;
-      headers = overrides.headers || baseMapping.headers;
-    } else {
-      status = route.status;
-      body = route.body;
-      headers = route.headers;
-    }
+    const { headers, status, body } = matchRoute(allMatchers)({ method: req.method, path: req.path});
     res.set(headers).status(status).json(body);
   });
 
@@ -57,15 +60,3 @@ exports.createApp = ({ config, baseMapping }) => {
   return app;
 };
 
-const findMatchingRoute = (path, method, routes) => {
-  const equalRoutes = routes.filter((r) => {
-    if (r.method) {
-      return r.path === path && r.method === method;
-    }
-    return r.path === path;
-  });
-  if (equalRoutes.length < 1) {
-    return null;
-  }
-  return equalRoutes[equalRoutes.length - 1];
-};

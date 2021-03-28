@@ -29,12 +29,6 @@ describe("app", () => {
         request(app, method, path).expect(200, done);
       });
 
-      test(`returns configured value for ${method} ${path}`, (done) => {
-        arg.baseMapping.status = 404;
-        const appReturning404 = createApp(arg);
-        request(appReturning404, method, path).expect(404, done);
-      });
-
       test(`returns status value set by api for ${method} ${path}`, (done) => {
         async.series(
           [
@@ -46,7 +40,7 @@ describe("app", () => {
       });
 
       test(`returns default response body for ${method} ${path}`, (done) => {
-        request(app, method, path).expect(200, {}, done);
+        request(app, method, path).expect(200, "", done);
       });
 
       test(`returns body set by api for ${method} ${path}`, (done) => {
@@ -99,16 +93,14 @@ describe("app", () => {
         (cb) =>
           request(app)
             .post("/config/routes")
-            .send({
-              routes: [
+            .send([
                 {
                   path: "/test",
                   status: 201,
                   body: { status: "created" },
                   headers: { "Content-Type": "application/json" },
                 },
-              ],
-            })
+              ])
             .end(cb),
         (cb) =>
           request(app)
@@ -120,7 +112,38 @@ describe("app", () => {
             .post("/test")
             .expect(201, { status: "created" })
             .expect("Content-Type", /json/, cb),
-        (cb) => request(app).get("/bla").expect(200, {}, cb),
+        (cb) => request(app).get("/bla").expect(200, "", cb),
+      ],
+      done
+    );
+  });
+
+  test(`POST /config/routes allows to override route matches with path params`, (done) => {
+    async.series(
+      [
+        (cb) =>
+          request(app)
+            .post("/config/routes")
+            .send([
+                {
+                  path: "/test/:param",
+                  status: 201,
+                  body: { status: "created" },
+                  headers: { "Content-Type": "application/json" },
+                },
+              ])
+            .end(cb),
+        (cb) =>
+          request(app)
+            .get("/test/abc")
+            .expect(201, { status: "created" })
+            .expect("Content-Type", /json/, cb),
+        (cb) =>
+          request(app)
+            .post("/test/def")
+            .expect(201, { status: "created" })
+            .expect("Content-Type", /json/, cb),
+        (cb) => request(app).get("/bla").expect(200, "", cb),
       ],
       done
     );
@@ -132,19 +155,18 @@ describe("app", () => {
         (cb) =>
           request(app)
             .post("/config/routes")
-            .send({
-              routes: [
+            .send([
                 {
                   path: "/test",
                   method: "GET",
                   status: 201,
                   body: { status: "created" },
                 },
-              ],
-            })
+              ]
+            )
             .end(cb),
         (cb) => request(app).get("/test").expect(201, { status: "created" }, cb),
-        (cb) => request(app).post("/test").expect(200, {}, cb),
+        (cb) => request(app).post("/test").expect(200, "", cb),
       ],
       done
     );
@@ -156,8 +178,7 @@ describe("app", () => {
         (cb) =>
           request(app)
             .post("/config/routes")
-            .send({
-              routes: [
+            .send([
                 {
                   path: "/test",
                   method: "GET",
@@ -169,12 +190,12 @@ describe("app", () => {
                   method: "GET",
                   status: 404,
                 },
-              ],
-            })
+              ]
+            )
             .end(cb),
         (cb) => request(app).get("/test").expect(201, { status: "created" }, cb),
         (cb) => request(app).get("/other-path").expect(404, "", cb),
-        (cb) => request(app).post("/test").expect(200, {}, cb),
+        (cb) => request(app).post("/test").expect(200, "", cb),
       ],
       done
     );

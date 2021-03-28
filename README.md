@@ -31,6 +31,12 @@ curl -X POST http://localhost:3000/config/routes \
         "body": { "status": "created" }
     },
     {
+      "path": "/test/:testid",
+        "method": "GET",
+        "status": 301,
+        "headers": { "Location": "https://www.google.de" }
+    },
+    {
       "path": "/other-path",
       "method": "GET",
       "status": 404
@@ -40,7 +46,37 @@ curl -X POST http://localhost:3000/config/routes \
 
 You can post there multiple times, adding new routes.
 Routes added later take precedence, if there are multiple matches.
-At the moment, one exact matches work.
+More specific routes take precedence over less specific ones.
+
+## Save and reload
+
+You can save and reload the current configuration using the
+`/config/routes` and `/config`-Endpoints.
+
+```sh
+# Save
+curl http://localhost:3000/config > config.json
+
+# Load
+curl -X POST http://localhost:3000/config/routes \
+  -H "Content-Type: application/json" \
+  -d @config.json
+```
+
+## Specificity
+
+http-mock has a few rules defining the precedence of rules. It aims to be as
+intuitive as possible.
+
+If you are unsure why a rule was matched when you expected another one, you can
+check the following rules. To get the configuration, you can also GET `/config`.
+This endpoint returns the matching rules in order of descending precedence.
+
+1. More path segments before less path segments
+2. Less path variables before more path variables
+3. Later occurring path variables before earlier ones
+4. Rules with method match before rules without method match
+5. Rules created later before rules created earlier
 
 ## Show configuration
 
@@ -48,17 +84,8 @@ The current config is accessible via GET /config.
 
 ## Roadmap
 
-- [x] GET /config
-- [x] Mock response data
-- [x] Override specific paths
-- [x] headers
-- [ ] Override paths with route params
-- [ ] load config via json
-- [ ] load overrides via multiple jsons
 - [ ] Dockerfile
-- [ ] Run on multiple ports:
-  - [ ] Configuration
-  - [ ] 1-n servers based on configuration
+- [ ] Load config from file
 - [ ] Release npm package
+- [ ] Release Dockerfile?
 - [ ] load HAR-files
-- [ ] https?
