@@ -89,15 +89,22 @@ If you are unsure why a rule was matched when you expected another one, you can
 check the following rules. To get the configuration, you can also GET `/config`.
 This endpoint returns the matching rules in order of descending precedence.
 
+1. More exact url parameter matches before less url parameter matches
+1. Exact url parameter matches before path without url parameter
 1. More path segments before less path segments
-2. Less path variables before more path variables
-3. Later occurring path variables before earlier ones
-4. Rules with method match before rules without method match
-5. Rules created later before rules created earlier
+1. Less path variables before more path variables
+1. Later occurring path variables before earlier ones
+1. Rules with method match before rules without method match
+1. Rules created later before rules created earlier
 
 ## Show configuration
 
 The current config is accessible via GET /config.
+
+## Development
+
+To create a new docker image, run `yarn build`.
+To push the image, run `yarn push`.
 
 ## Roadmap
 

@@ -34,6 +34,16 @@ const matchesRequest = (request, matcher) => {
       }
     }
   }
+  if (matcher.query && !request.query) {
+    return false;
+  }
+  if (matcher.query && request.query) {
+    for (const key in matcher.query) {
+      if (!request.query[key] || request.query[key] !== matcher.query[key]) {
+        return false;
+      }
+    }
+  }
   return true;
 };
 
@@ -58,7 +68,30 @@ const compareFunction = (firstEl, secondEl) => {
   if (methodOrder !== 0) {
     return methodOrder;
   }
+  const queryCountOrder = compareQueryCount(firstEl.query, secondEl.query);
+  if (queryCountOrder !== 0) {
+    return queryCountOrder;
+  }
   return compareTimestamps(firstEl.createdAt, secondEl.createdAt);
+};
+
+const compareQueryCount = (a, b) => {
+  const queryCountA = queryCount(a);
+  const queryCountB = queryCount(b);
+  if (queryCountA > queryCountB) {
+    return -1;
+  }
+  if (queryCountA < queryCountB) {
+    return 1;
+  }
+  return 0;
+};
+
+const queryCount = (query) => {
+  if (!query) {
+    return -1;
+  }
+  return Object.keys(query).length;
 };
 
 const compareSegmentCount = (a, b) => {

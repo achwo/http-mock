@@ -94,13 +94,13 @@ describe("app", () => {
           request(app)
             .post("/config/routes")
             .send([
-                {
-                  path: "/test",
-                  status: 201,
-                  body: { status: "created" },
-                  headers: { "Content-Type": "application/json" },
-                },
-              ])
+              {
+                path: "/test",
+                status: 201,
+                body: { status: "created" },
+                headers: { "Content-Type": "application/json" },
+              },
+            ])
             .end(cb),
         (cb) =>
           request(app)
@@ -125,13 +125,13 @@ describe("app", () => {
           request(app)
             .post("/config/routes")
             .send([
-                {
-                  path: "/test/:param",
-                  status: 201,
-                  body: { status: "created" },
-                  headers: { "Content-Type": "application/json" },
-                },
-              ])
+              {
+                path: "/test/:param",
+                status: 201,
+                body: { status: "created" },
+                headers: { "Content-Type": "application/json" },
+              },
+            ])
             .end(cb),
         (cb) =>
           request(app)
@@ -156,14 +156,13 @@ describe("app", () => {
           request(app)
             .post("/config/routes")
             .send([
-                {
-                  path: "/test",
-                  method: "GET",
-                  status: 201,
-                  body: { status: "created" },
-                },
-              ]
-            )
+              {
+                path: "/test",
+                method: "GET",
+                status: 201,
+                body: { status: "created" },
+              },
+            ])
             .end(cb),
         (cb) => request(app).get("/test").expect(201, { status: "created" }, cb),
         (cb) => request(app).post("/test").expect(200, "", cb),
@@ -179,19 +178,18 @@ describe("app", () => {
           request(app)
             .post("/config/routes")
             .send([
-                {
-                  path: "/test",
-                  method: "GET",
-                  status: 201,
-                  body: { status: "created" },
-                },
-                {
-                  path: "/other-path",
-                  method: "GET",
-                  status: 404,
-                },
-              ]
-            )
+              {
+                path: "/test",
+                method: "GET",
+                status: 201,
+                body: { status: "created" },
+              },
+              {
+                path: "/other-path",
+                method: "GET",
+                status: 404,
+              },
+            ])
             .end(cb),
         (cb) => request(app).get("/test").expect(201, { status: "created" }, cb),
         (cb) => request(app).get("/other-path").expect(404, "", cb),

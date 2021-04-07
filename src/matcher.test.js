@@ -158,14 +158,22 @@ describe("sortRoutesBySpecificity", () => {
       { path: "/path/v1/concrete", createdAt: new Date("2021-03-28T12:00:00.000Z") },
       { path: "/path/v1" },
       { path: "/some/:param/path" },
+      { path: "/some/path/without/param" },
       { path: "/:param/different/path" },
       { path: "/path/v1/concrete", method: "GET" },
       { path: "/some/:param/:param" },
       { path: "/some/different/path", method: "GET" },
+      { path: "/some/path/without/param", query: { param: "true" } },
+      { path: "/some/:param" },
+      { path: "/some/:param", query: { with: "url", param: "true" } },
+      { path: "/some/path", query: { with: "url", param: "true" } },
+      { path: "/some/path", method: "POST", query: { with: "url", param: "true" } },
       {},
     ];
 
     const sorted = [
+      { path: "/some/path/without/param", query: { param: "true" } },
+      { path: "/some/path/without/param" },
       { path: "/path/v1/concrete", method: "GET" },
       { path: "/some/different/path", method: "GET" },
       { path: "/some/different/path" },
@@ -176,9 +184,13 @@ describe("sortRoutesBySpecificity", () => {
       { path: "/:param/different/path" },
       { path: "/path/:param/:param" },
       { path: "/some/:param/:param" },
+      { path: "/some/path", method: "POST", query: { with: "url", param: "true" } },
       { path: "/path/v1", method: "POST" },
       { path: "/path/v1", method: "GET" },
+      { path: "/some/path", query: { with: "url", param: "true" } },
       { path: "/path/v1" },
+      { path: "/some/:param", query: { with: "url", param: "true" } },
+      { path: "/some/:param" },
       { path: "/path" },
       { method: "GET" },
       {},
@@ -300,6 +312,44 @@ describe("compareFunction", () => {
         expect(compareFunction(a, a)).toBe(0);
       });
     });
+
+    describe("exact query matches before path without url parameter", () => {
+      test("returns -1 when a before b", () => {
+        const a = { path: "/api/v1", query: { with: "url", params: "true" } };
+        const b = { path: "/api/v1" };
+        expect(compareFunction(a, b)).toBe(-1);
+      });
+
+      test("returns 1 when b before a", () => {
+        const a = { path: "/api/v1", query: { with: "url", params: "true" } };
+        const b = { path: "/api/v1" };
+        expect(compareFunction(b, a)).toBe(1);
+      });
+
+      test("returns 0 when equal", () => {
+        const a = { path: "/api/v1", query: { with: "url", params: "true" } };
+        expect(compareFunction(a, a)).toBe(0);
+      });
+    });
+
+    describe("more exact query matches before less url parameter matches", () => {
+      test("returns -1 when a before b", () => {
+        const a = { path: "/api/v1", query: { with: "url", params: "true" } };
+        const b = { path: "/api/v1", query: { with: "url" } };
+        expect(compareFunction(a, b)).toBe(-1);
+      });
+
+      test("returns 1 when b before a", () => {
+        const a = { path: "/api/v1", query: { with: "url", params: "true" } };
+        const b = { path: "/api/v1", query: { with: "url" } };
+        expect(compareFunction(b, a)).toBe(1);
+      });
+
+      test("returns 0 when equal", () => {
+        const a = { path: "/api/v1", query: { with: "url", params: "true" } };
+        expect(compareFunction(a, a)).toBe(0);
+      });
+    });
   });
 });
 
@@ -368,6 +418,50 @@ describe("matchesRequest", () => {
         { path: "/:param1/:param2/:param3" }
       );
       expect(result).toBe(true);
+    });
+  });
+
+  describe("with matching query", () => {
+    test("returns true if request and matcher query params are equal", () => {
+      const request = { query: { p1: "true", p2: "cow" } };
+      const matcher = request;
+      expect(matchesRequest(request, matcher)).toBe(true);
+    });
+
+    test("returns true if request has more params than matcher", () => {
+      const request = { query: { p1: "true", p2: "cow" } };
+      const matcher = { query: { p1: "true" } };
+      expect(matchesRequest(request, matcher)).toBe(true);
+    });
+
+    test("returns false if request misses params", () => {
+      const request = { query: { p1: "true" } };
+      const matcher = { query: { p1: "true", p2: "cow" } };
+      expect(matchesRequest(request, matcher)).toBe(false);
+    });
+
+    test("returns false if param value not matching", () => {
+      const request = { query: { p1: "true", p2: "dog" } };
+      const matcher = { query: { p1: "true", p2: "cow" } };
+      expect(matchesRequest(request, matcher)).toBe(false);
+    });
+
+    test("returns true if matcher has no query", () => {
+      const request = { query: { p1: "true", p2: "dog" } };
+      const matcher = {};
+      expect(matchesRequest(request, matcher)).toBe(true);
+    });
+
+    test("returns false if request has no query", () => {
+      const request = {};
+      const matcher = { query: { p1: "true", p2: "cow" } };
+      expect(matchesRequest(request, matcher)).toBe(false);
+    });
+
+    test("returns true if neither has a query", () => {
+      const request = {};
+      const matcher = {};
+      expect(matchesRequest(request, matcher)).toBe(true);
     });
   });
 });

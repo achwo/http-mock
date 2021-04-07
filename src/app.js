@@ -11,20 +11,14 @@ const { sortRoutesBySpecificity, matchRoute } = require("./matcher.js");
  */
 exports.createApp = ({ config, mapping }) => {
   const app = express();
-  let routeMatches = mapping || [];
-  const globalMatch = { type: "globalMatch" }
+  let routeMatches = convertRouteMatches(mapping);
+  const globalMatch = { type: "globalMatch" };
 
   app.use(requestLogger(config.logLevel));
   app.use(express.json());
 
   app.post("/config/routes", (req, res) => {
-    const newRoutes = req.body.map(r => {
-      return Object.assign(r, {
-        createdAt: new Date(Date.now()),
-        type: "routeMatch"
-      })
-    }
-    )
+    const newRoutes = convertRouteMatches(req.body);
     routeMatches = routeMatches.concat(newRoutes);
     res.status(200).json();
   });
@@ -37,21 +31,18 @@ exports.createApp = ({ config, mapping }) => {
   });
 
   app.get("/config", (_req, res) => {
-    const allMatchers = sortRoutesBySpecificity([
-      ...routeMatches,
-      globalMatch,
-    ]);
+    const allMatchers = sortRoutesBySpecificity([...routeMatches, globalMatch]);
     res.json(allMatchers);
   });
 
   app.all("*", (req, res) => {
-    const allMatchers = sortRoutesBySpecificity([
-      ...routeMatches,
-      globalMatch,
-      { status: 200 }
-    ]);
+    const allMatchers = sortRoutesBySpecificity([...routeMatches, globalMatch, { status: 200 }]);
 
-    const { headers, status, body } = matchRoute(allMatchers)({ method: req.method, path: req.path});
+    const { headers, status, body } = matchRoute(allMatchers)({
+      method: req.method,
+      path: req.path,
+      query: req.query,
+    });
     res.set(headers).status(status).json(body);
   });
 
@@ -60,3 +51,14 @@ exports.createApp = ({ config, mapping }) => {
   return app;
 };
 
+const convertRouteMatches = (matches) => {
+  if (!matches) {
+    return [];
+  }
+  return matches.map((r) => {
+    return Object.assign(r, {
+      createdAt: new Date(Date.now()),
+      type: "routeMatch",
+    });
+  });
+};

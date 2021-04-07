@@ -7,6 +7,8 @@
   "license": "MIT",
   "scripts": {
     "start": "node index.js",
+    "build": "docker build -t achwo/http-mock:latest .",
+    "push": "docker push achwo/http-mock:latest",
     "test": "jest --watch",
     "test:ci": "jest",
     "format": "prettier --write ."
